@@ -1,8 +1,8 @@
 import de.heikoseeberger.sbtheader.HeaderKey._
 import de.heikoseeberger.sbtheader.license.Apache2_0
+import sbt.Defaults
 //import com.typesafe.sbt.site.util.SiteHelpers._
 import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
-
 
 name := "lab-cassandra"
 
@@ -48,7 +48,7 @@ def licenceSettings = Seq(
 
 lazy val Benchmark = config("bench") extend Test
 
-def commonSettings = Seq(
+def commonSettings = Defaults.coreDefaultSettings ++ Seq(
   organization := "com.github.mboogerd",
   scalaVersion := "2.11.8",
   // Bintray repo required until this is fixed: https://github.com/outworkers/phantom/issues/544
@@ -64,7 +64,7 @@ def commonSettings = Seq(
   testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework"),
   parallelExecution in Benchmark := false,
   parallelExecution in Test := false
-)
+) ++ PhantomSbtPlugin.projectSettings
 
 def gatlingSettings = Seq(
   libraryDependencies ++= Seq(

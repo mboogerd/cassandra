@@ -18,9 +18,8 @@ package com.github.mboogerd.lab.cassandra.testspec
 
 import com.github.mboogerd.lab.cassandra.DatabaseProvider
 import com.websudos.phantom.dsl._
-import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FlatSpec, Matchers}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -29,7 +28,7 @@ import scala.concurrent.duration._
   * Inspired by "Testing with phantom-sbt", which can be found here:
   * http://outworkers.com/blog/post/phantom-tips-tip2-testing-with-phantom-sbt
   */
-trait CassandraTestSpec extends FlatSpec with Matchers with BeforeAndAfterAll with ScalaFutures with DatabaseProvider {
+trait CassandraTestSpec extends FlatSpec with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with ScalaFutures with DatabaseProvider {
 
   behavior of "Cassandra"
 
@@ -40,18 +39,20 @@ trait CassandraTestSpec extends FlatSpec with Matchers with BeforeAndAfterAll wi
   private implicit lazy val keyspace: KeySpace = database.space
 
   override protected def beforeAll(): Unit = {
-
-    // Start the embedded database
-    val eventualInitization = database.autocreate().future()
-    // auto-create the database instance, and await its completion before running the test
-    eventualInitization.futureValue(Timeout(60.seconds))
-
-    super.beforeAll()
+    database.initialize()
+    // auto-create the database schema, and await its completion before running the test
+    Await.result(database.autocreate().future(), 10.seconds)
   }
 
   override protected def afterAll(): Unit = {
     super.afterAll()
+    // Ensure proper suite isolation by cleaning the schema after all tests
+    Await.result(database.autodrop().future(), 10.seconds)
+  }
+
+  override protected def afterEach(): Unit = {
+    super.afterEach()
+    // Ensure proper test-isolation by cleaning tables between each test
     Await.result(database.autotruncate.future(), 5.seconds)
-    database.shutdown()
   }
 }

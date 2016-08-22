@@ -28,7 +28,7 @@ import scala.concurrent.duration._
   * Inspired by "Testing with phantom-sbt", which can be found here:
   * http://outworkers.com/blog/post/phantom-tips-tip2-testing-with-phantom-sbt
   */
-trait CassandraTestSpec extends FlatSpec with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with ScalaFutures with DatabaseProvider {
+trait CassandraTestSpec extends FlatSpec with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with ScalaFutures with DatabaseProvider with GeneratorUtils {
 
   behavior of "Cassandra"
 

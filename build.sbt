@@ -90,7 +90,8 @@ lazy val phantom = project.in(file("phantom"))
   .settings(licenceSettings)
   .settings{
     libraryDependencies ++= Seq(
-      "com.websudos" %% "phantom-dsl" % "1.28.12"
+      "com.websudos" %% "phantom-dsl" % "1.28.12",
+      "com.websudos" %% "phantom-reactivestreams" % "1.28.12"
     )
   }
   .enablePlugins(AutomateHeaderPlugin)
